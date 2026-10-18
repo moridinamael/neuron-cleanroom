@@ -29,6 +29,9 @@ ALLOW = [
     "bonsai_interp/probe/__init__.py", "bonsai_interp/probe/workspace.py", "bonsai_interp/probe/forward.py",
     "bonsai_interp/probe/textinv.py", "bonsai_interp/probe/run.py", "bonsai_interp/probe/induce.py",
     "bonsai_interp/probe/neighbors.py", "bonsai_interp/probe/quick.py", "bonsai_interp/probe/bands.py",
+    # contributor commands, so the room's tests come out in the graph's contribution format
+    "bonsai_interp/graph/__init__.py", "bonsai_interp/graph/contrib.py", "bonsai_interp/graph/protocols.py",
+    "bonsai_interp/graph/play.py",
 ]
 DATA = ["corpus.npz", "scan_bonsai1.npz"]
 NEURON_REF = re.compile(r"\b(\d{1,2})/(\d{2,5})\b")  # neuron examples like 9/3688 in docstrings
@@ -54,8 +57,8 @@ def link(src: Path, dst: Path):
 
 def scrub(text, L, n):
     """Replace example neuron references in docstrings so none points at the target or at a studied neuron."""
-    return "".join(NEURON_REF.sub("12/345", ln) if re.search(r"-m |--neuron|--units|python ", ln) else ln
-                   for ln in text.splitlines(keepends=True))
+    return "".join(re.sub(r"\bL\d{1,2}/N\d{2,5}", "L12/N345", NEURON_REF.sub("12/345", ln))
+                   if re.search(r"-m |--neuron|--units|python ", ln) else ln for ln in text.splitlines(keepends=True))
 
 
 def build(a):
@@ -95,7 +98,7 @@ def build(a):
         readme = readme.replace("<!-- HINTS:methods -->\n", "").replace("<!-- /HINTS -->\n", "")
     (out / "README.md").write_text(readme, encoding="utf-8")
     brief = (HERE / "templates" / "BRIEF.md").read_text(encoding="utf-8").format(
-        model_name=MODEL_NAMES[a.model][0], L=L, n=n, gmoo_budget=a.gmoo_budget, hours=a.hours)
+        model_name=MODEL_NAMES[a.model][0], L=L, n=n, gmoo_budget=a.gmoo_budget, hours=a.hours, handle=a.handle)
     (out / "BRIEF.md").write_text(brief, encoding="utf-8")
     # the seal
     home = Path.home()
@@ -128,7 +131,7 @@ def build(a):
     (run / "manifest.json").write_text(json.dumps({
         "neuron": f"{a.model}/L{L}/N{n}", "room": str(out), "room_initial_commit": room_commit,
         "interp_commit": commit, "interp_ref": a.ref, "files": hashes, "hints": a.hints,
-        "gmoo_budget": a.gmoo_budget, "hours": a.hours, "deny": deny, "forbid_checked": a.forbid}, indent=1), encoding="utf-8")
+        "gmoo_budget": a.gmoo_budget, "hours": a.hours, "handle": a.handle, "deny": deny, "forbid_checked": a.forbid}, indent=1), encoding="utf-8")
     shutil.copy2(out / "BRIEF.md", run / "BRIEF.md")
     print(f"room sealed at {out} (commit {room_commit[:7]}), interp {commit[:7]}, hints={a.hints}; manifest in {run}")
 
@@ -148,6 +151,7 @@ def main():
     ap.add_argument("--hints", choices=["none", "methods"], default="none")
     ap.add_argument("--gmoo-budget", type=int, default=1)
     ap.add_argument("--hours", type=float, default=3)
+    ap.add_argument("--handle", default="cleanroom-claude", help="contributor handle the agent signs its contributions with")
     ap.add_argument("--deny-read", nargs="*", default=[], help="extra folders the agent must not read")
     ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room, e.g. key words of the existing label (not the target id: the brief names it)")
     a = ap.parse_args()

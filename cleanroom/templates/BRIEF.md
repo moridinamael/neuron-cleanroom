@@ -19,6 +19,37 @@ this folder.
 - You may use sub-agents, for example to label examples blind or to write test sentences.
 - **Budget:** at most **{gmoo_budget}** globalMOO model(s) in total. SciPy solvers are
   unlimited. Aim to finish within about {hours} hours of wall-clock time.
+- The model weights, corpus and scan are already in place (see README). Don't download anything.
+
+## Record your labels as contributions
+
+Your tested labels will be added to a shared public map, so record them in its format. Any other
+analysis can use whatever tools you like.
+
+- **For each pole's final label**, and for any earlier label you want on record, run:
+
+  ```
+  python -m bonsai_interp.graph.play new interpret --neuron bonsai1/L{L}/N{n}<+|-> --handle {handle}
+  ```
+
+  Fill in the file it writes: the label, 8 sentences that should fire, 8 near misses, and
+  optionally `short`, `unit_kind` and `confidence`. Commit that file **on its own**. Then run
+  `python -m bonsai_interp.graph.play run <that file>` and commit the results in a **separate,
+  later** commit. A failed label is worth recording too.
+- **Map the immediate neighbourhood.** For each pole, list its strongest feeders:
+
+  ```
+  python -m bonsai_interp.graph.play step --neuron bonsai1/L{L}/N{n}<+|-> --k 4
+  ```
+
+  Take the two with the largest drop. For each one:
+  1. Label it from its top examples (`play look`).
+  2. Test that label the same way (`play new interpret`, commit, `play run`, commit). Add
+     `"roles": ["feeds bonsai1/L{L}/N{n}<pole>"]` to its tests file.
+  3. Record the edge with
+     `python -m bonsai_interp.graph.play edge --from <feeder id> --to <this pole's id> --weight <drop> --handle {handle}`.
+
+  Keep this light: one quick test per feeder.
 
 ## Deliverables
 

@@ -143,6 +143,18 @@ Lower-level pieces:
   - use `rec.interventions = {L: fn}` to edit activations
   - set `rec.stop_at = L` to stop the forward pass early (raises `StopForward`)
 
+### Recording labels in the shared format
+
+`bonsai_interp.graph.play` writes tests and results in the format of the public map.
+
+| Command | What it does |
+|---|---|
+| `play look --neuron bonsai1/L12/N345+` | top corpus examples |
+| `play new interpret --neuron … --handle …` | writes `graph/contributions/…/<id>.tests.json`. Fill it in, then commit it alone |
+| `play run <tests file>` | refuses uncommitted or edited test files; writes `<id>.json` with per-sentence results. Commit it separately |
+| `play step --neuron … --k 4` | the strongest feeders of a pole (attribution, then single-unit zeroing on its top examples) |
+| `play edge --from … --to … --weight … --handle …` | records a measured edge |
+
 ## Good practice
 
 - Write predictions and test sentences down, and `git commit` them, **before** you run them.

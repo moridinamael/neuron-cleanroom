@@ -46,6 +46,17 @@ def main():
             ev = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if ev.get("type") == "item.completed" and isinstance(ev.get("item"), dict):  # Codex `exec --json` events
+            it = ev["item"]
+            kind = it.get("type", "?")
+            if kind in ("command_execution", "file_change", "mcp_tool_call", "web_search"):
+                payload = {k: it.get(k) for k in ("command", "changes", "server", "tool", "arguments", "query") if it.get(k) is not None}
+                calls[it.get("id", str(len(calls)))] = {"tool": {"web_search": "WebSearch"}.get(kind, kind), "input": json.dumps(payload, ensure_ascii=False),
+                                                         "text": " ".join(_strings(payload)), "sub_agent": False}
+                out_txt = str(it.get("aggregated_output") or "")
+                if re.search(r"(?i)permission.{0,40}(denied|blocked)|access is denied|sandbox", out_txt) and it.get("exit_code"):
+                    denied.add(it.get("id", ""))
+            continue
         content = (ev.get("message") or {}).get("content")
         for c in content if isinstance(content, list) else []:
             if c.get("type") == "tool_use":
