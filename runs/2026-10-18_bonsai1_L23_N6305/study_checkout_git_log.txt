@@ -1,0 +1,29 @@
+66231e3 2026-10-18 11:38:47 -0600 Complete two-pole neuron study with reports and validated evidence
+674810b 2026-10-18 11:36:16 -0600 Record final positive context-gated label result
+80c8644 2026-10-18 11:26:25 -0600 Record revised negative label test result
+5e539e7 2026-10-18 11:25:55 -0600 Record feeder L22_N12064_neg test result
+28b2c24 2026-10-18 11:25:26 -0600 Record feeder L22_N408_pos test result
+1b48a30 2026-10-18 11:25:10 -0600 Record negative inverse and context-transfer evidence
+afef9ff 2026-10-18 11:25:09 -0600 Pre-register final positive context-gated label
+b6d7dac 2026-10-18 11:24:56 -0600 Record feeder L22_N4819_pos test result
+65f4793 2026-10-18 11:24:24 -0600 Record feeder L19_N11756_neg test result
+2f554fe 2026-10-18 11:22:35 -0600 Bound long-prefix batches after CUDA execution failure
+71af40f 2026-10-18 11:19:14 -0600 Record positive inverse search and reproducibility metadata
+50b16d2 2026-10-18 11:18:03 -0600 Pre-register natural-size next-token ablations
+320bed6 2026-10-18 11:12:52 -0600 Pre-register lower-activation corpus coverage audit
+10c102b 2026-10-18 11:12:28 -0600 Document local study repository and revised test generation
+261c1db 2026-10-18 11:12:27 -0600 Pre-register revised negative reference-domain label
+ec25557 2026-10-18 11:11:16 -0600 Pre-register positive context transfer and prefix-length controls
+8333d46 2026-10-18 11:10:11 -0600 Record initial results diagnostics and circuit audit
+506a4b7 2026-10-18 11:10:11 -0600 Pre-register feeder L22_N12064_neg interpretation
+d71379e 2026-10-18 11:10:11 -0600 Pre-register feeder L22_N408_pos interpretation
+3631f69 2026-10-18 11:10:11 -0600 Pre-register feeder L22_N4819_pos interpretation
+4677944 2026-10-18 11:10:11 -0600 Pre-register feeder L19_N11756_neg interpretation
+ba89ed5 2026-10-18 11:06:36 -0600 Pre-register signed feeder ablations and scan reproduction audit
+c07897b 2026-10-18 11:05:11 -0600 Pre-register context tokenization and syntactic-boundary tests
+88aea49 2026-10-18 11:03:51 -0600 Record negative initial hypothesis result
+b31ba29 2026-10-18 11:03:22 -0600 Record positive initial hypothesis result
+3970260 2026-10-18 11:02:48 -0600 Pre-register adversarial banks inverse and induction predictions
+300026e 2026-10-18 11:02:48 -0600 Pre-register negative restrictive-relative hypothesis
+d8088b9 2026-10-18 11:02:48 -0600 Pre-register positive temporal-frame hypothesis
+e5b1fdf 2026-10-18 11:02:38 -0600 Snapshot supplied toolchain from read-only parent 5b02f71

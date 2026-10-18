@@ -1,0 +1,60 @@
+{
+ "neuron": "bonsai1/L23/N6305",
+ "room": "~\\Documents\\rooms\\L23_N6305",
+ "room_initial_commit": "5b02f71c9848ac40ac08388d5e1ea10296aaa1ea",
+ "interp_commit": "7696969f29f525bed6f904fd21a347e04bebbc4a",
+ "interp_ref": "main",
+ "files": {
+  "bonsai_interp/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/model.py": "52d93040fdf4a57f",
+  "bonsai_interp/explore.py": "0f5115ef0e7a1bdf",
+  "bonsai_interp/inverse/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/inverse/problem.py": "8aad7d59dd73d5d4",
+  "bonsai_interp/inverse/solvers.py": "fd76eff154e1d17e",
+  "bonsai_interp/inverse/neuron.py": "c925ccd567ecdbda",
+  "bonsai_interp/inverse/linear.py": "7ac0357ceb22cf48",
+  "bonsai_interp/probe/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/probe/workspace.py": "ab79d23f97ce3f9f",
+  "bonsai_interp/probe/forward.py": "c37b06fb3e826048",
+  "bonsai_interp/probe/textinv.py": "edbca27395aa786d",
+  "bonsai_interp/probe/run.py": "1a01d298ae7b7db9",
+  "bonsai_interp/probe/induce.py": "066f3a6c3f2fe43b",
+  "bonsai_interp/probe/neighbors.py": "7069baa29ea68190",
+  "bonsai_interp/probe/quick.py": "078c412890487288",
+  "bonsai_interp/probe/bands.py": "e6fba7ceaf8fc616",
+  "bonsai_interp/graph/__init__.py": "b8e5aab5e92d9461",
+  "bonsai_interp/graph/contrib.py": "65a0124fde3d0485",
+  "bonsai_interp/graph/protocols.py": "ad1da0d1077b9364",
+  "bonsai_interp/graph/play.py": "c96c5d40eef670e4"
+ },
+ "hints": "none",
+ "gmoo_budget": 1,
+ "hours": 3,
+ "handle": "cleanroom-codex",
+ "deny": [
+  "WebFetch",
+  "WebSearch",
+  "Read(/~/Documents/GitHub/monosemanticity/**)",
+  "Read(/~/.claude/**)",
+  "Bash(*monosemanticity*)",
+  "Bash(*.claude/projects*)",
+  "Bash(*.claude\\projects*)",
+  "Read(/~/AppData/**)"
+ ],
+ "forbid_checked": [],
+ "launch": {
+  "agent": "codex",
+  "model": "codex default",
+  "flags": [
+   "exec",
+   "--json",
+   "--skip-git-repo-check",
+   "-s",
+   "workspace-write",
+   "-C",
+   "~\\Documents\\rooms\\L23_N6305"
+  ],
+  "exit_code": 0
+ },
+ "predictions_commit": "6ce806f"
+}

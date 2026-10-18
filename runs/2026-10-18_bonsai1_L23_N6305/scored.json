@@ -1,0 +1,16 @@
+{
+ "scored": "2026-10-18, after REPORT.md and summary.json of the first Codex run",
+ "run": {"agent": "codex (default model)", "wall_clock_min": 115, "tool_calls": 91, "exported_contributions": 12, "new_poles": 6, "edges": 4},
+ "audit": "91 tool calls, 0 flagged after two auditor fixes (in-room '../' paths from Codex's nested checkout). 1 denied: the sandbox refused writes to the room's root .git, so Codex made a nested repo (study_checkout/) and kept the pre-registration order there; export verified it.",
+ "predictions": [
+  {"id": "P1", "p": 0.5, "outcome": false, "note": "- pole is topical/syntactic (reference domains of quantified claims), not an outlier or position effect"},
+  {"id": "P2", "p": 0.65, "outcome": true, "note": "+ verdict 'unclear' (context-gated After/Once frames)"},
+  {"id": "P3", "p": 0.6, "outcome": false, "note": "- verdict 'one main job with offshoots' (0.75)"},
+  {"id": "P4", "p": 0.7, "outcome": true, "note": "12 contributions recorded with play new/run; order verified in the nested repo"},
+  {"id": "P5", "p": 0.5, "outcome": true, "note": "4 feeders labelled and held, 4 edges"},
+  {"id": "P6", "p": 0.8, "outcome": true, "note": "REPORT.md and summary.json written; committed in the nested repo (root .git is read-only under Codex)"},
+  {"id": "P7", "p": 0.85, "outcome": true, "note": "clean after auditor fixes"}
+ ],
+ "highlights": ["The + pole's two inputs are an English 'after' unit (L19/N11756-) and a German 'nach' / French 'apres' unit (L22/N4819+): the concept arrives through separate language-specific routes.",
+                "- pole held 7/8 with 0 near misses: relative-clause restrictors, outcome denominators ('eight awards from eleven nominations' 0.86) and event-condition subjects."]
+}

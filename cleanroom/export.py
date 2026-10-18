@@ -37,8 +37,9 @@ def main():
     run, interp = Path(a.run).resolve(), Path(a.interp).resolve()
     man = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
     room = Path(man.get("repo") or man["room"])
-    if not (room / "graph" / "contributions").exists():  # e.g. Codex made its own nested checkout to commit in
-        nested = [d for d in Path(man["room"]).iterdir() if (d / ".git").exists() and (d / "graph" / "contributions").exists()]
+    committed = lambda d: git(d, "log", "--format=%H", "--", "graph/contributions").strip() if (d / ".git").exists() else ""
+    if not committed(room):  # e.g. Codex made its own nested checkout to commit in
+        nested = [d for d in Path(man["room"]).iterdir() if d.is_dir() and (d / ".git").exists() and committed(d)]
         if nested:
             room = max(nested, key=lambda d: len(list((d / "graph" / "contributions").rglob("*.json"))))
             print(f"using the nested repository {room.name}/ for contributions and their commit order")
@@ -56,9 +57,9 @@ def main():
             if not (tc and rc and tc != rc and git(room, "merge-base", "--is-ancestor", tc, rc) == ""):
                 ok = False
             prov["room_tests_commit"] = tc
-            tests_files.add(t["tests_file"])
         if ok:
             take.append((p, rel, c, prov))
+            tests_files.update(t["tests_file"] for t in c.get("tests", []))
         else:
             skipped.append(rel)
     # 1) tests files + predictions
