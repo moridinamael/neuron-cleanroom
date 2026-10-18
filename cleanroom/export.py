@@ -25,6 +25,21 @@ def git(repo, *a):
     return subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
+def redact(folder):
+    """No local paths in run evidence (DATA_POLICY): the same rules as bonsai-interp's scripts/redact_paths.py."""
+    import re
+    n = re.escape(Path.home().name)
+    for f in [q for q in Path(folder).rglob("*") if q.suffix in (".json", ".jsonl", ".md", ".txt")]:
+        s = f.read_text(encoding="utf-8")
+        r = re.sub(rf"(?i)[a-z]:(?:\\\\|\\|/)+users(?:\\\\|\\|/)+{n}", "~", s)
+        r = re.sub(rf"(?i)/[a-z]/users/{n}", "~", r)
+        r = re.sub(rf"/(?:home|Users)/{n}", "~", r)
+        r = re.sub(rf"(?i)([a-z])--users-{n}-", r"\1--Users-USER-", r)
+        r = re.sub(rf"\b{n}\b", "USER", r)
+        if r != s:
+            f.write_text(r, encoding="utf-8", newline="\n")
+
+
 def first_commit(repo, path):
     out = git(repo, "log", "--diff-filter=A", "--format=%H", "--", path).split()
     return out[-1] if out else None
@@ -82,6 +97,7 @@ def main():
         dst = interp / tf
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(room / tf, dst)
+    redact(pred_dst)
     if not a.no_commit:
         git(interp, "add", "graph/contributions", str(pred_dst.relative_to(interp)))
         git(interp, "commit", "-q", "-m", f"Clean-room run {run.name}: pre-registered tests (verified first in the room) and our predictions")
@@ -129,6 +145,7 @@ def main():
     print(f"exported {len(take)} contributions; skipped {len(skipped)} whose order could not be verified: {skipped}")
     if a.no_commit:
         return
+    redact(pred_dst)
     git(interp, "add", "graph/contributions", str(pred_dst.relative_to(interp)))
     git(interp, "commit", "-q", "-m", f"Clean-room run {run.name}: results, edges and blind verdicts ({len(take)} contributions)")
     c = subprocess.run([str(py), "-m", "bonsai_interp.graph.check_prereg", "--base", "origin/main"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
