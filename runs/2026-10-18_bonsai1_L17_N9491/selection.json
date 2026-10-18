@@ -1,0 +1,8 @@
+{
+ "drawn": "2026-10-18T11:14:42",
+ "seed": 20261022,
+ "layers": "6-24",
+ "agent": "claude",
+ "rule": "random.Random(seed): layer uniform in the range, index uniform in 0..12287; redraw only if a pole is already in the graph. The first such draw is used whatever it looks like.",
+ "neuron": "bonsai1/L17/N9491"
+}
