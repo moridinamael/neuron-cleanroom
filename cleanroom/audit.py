@@ -16,6 +16,18 @@ from pathlib import Path
 WEB = {"WebFetch", "WebSearch"}
 
 
+def _strings(x):
+    """Every string inside a tool input, decoded (so an escaped \\n in a heredoc is a newline, not a path)."""
+    if isinstance(x, str):
+        yield x
+    elif isinstance(x, dict):
+        for v in x.values():
+            yield from _strings(v)
+    elif isinstance(x, list):
+        for v in x:
+            yield from _strings(v)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True)
@@ -24,7 +36,8 @@ def main():
     man = json.loads((run / "manifest.json").read_text(encoding="utf-8")) if (run / "manifest.json").exists() else {}
     room = Path(man.get("room", ".")).resolve().as_posix().lower()
     room_name = Path(room).name
-    outside = re.compile(r"(?i)(?<![\w.])(?:[a-z]:[/\\]|/c/|/home/|/users/|~[/\\]|\.\.[/\\])[^\s\"'`]*")
+    # a drive path needs a real first segment (C:/Users), so code like "if a:\n" in a test sentence is not a path
+    outside = re.compile(r"(?i)(?<![\w.])(?:[a-z]:/[\w.-]{2,}|/c/|/home/|/users/|~/|\.\./)[^\s\"'`]*")
     named = re.compile(r"(?i)bonsai-interp|monosemanticity|\.claude[/\\]projects|FINDINGS\.md|graph[/\\]neurons")
     calls, results, denied = {}, {}, set()
     for line in (run / "transcript.jsonl").read_text(encoding="utf-8").splitlines():
@@ -36,7 +49,7 @@ def main():
         for c in content if isinstance(content, list) else []:
             if c.get("type") == "tool_use":
                 calls[c["id"]] = {"tool": c["name"], "input": json.dumps(c["input"], ensure_ascii=False),
-                                  "sub_agent": ev.get("parent_tool_use_id") is not None}
+                                  "text": " ".join(_strings(c["input"])), "sub_agent": ev.get("parent_tool_use_id") is not None}
             elif c.get("type") == "tool_result":
                 txt = c.get("content")
                 txt = txt if isinstance(txt, str) else json.dumps(txt, ensure_ascii=False)
@@ -45,7 +58,7 @@ def main():
                     denied.add(c["tool_use_id"])
     flagged = []
     for i, c in calls.items():
-        raw = c["input"].replace("\\\\", "/").replace("\\n", " ")
+        raw = c["text"].replace("\\", "/")  # the real argument text (decoded), with Windows separators normalised
         paths = [p for p in outside.findall(raw) if room_name not in p.lower() and room not in p.lower()]
         why = ([f"path outside the room: {paths[:3]}"] if paths else []) + \
               ([f"names {named.findall(raw)[:3]}"] if named.search(raw) else []) + (["web tool"] if c["tool"] in WEB else [])
