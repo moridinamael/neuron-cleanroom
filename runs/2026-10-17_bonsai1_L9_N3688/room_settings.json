@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "Agent", "NotebookEdit"],
+    "deny": [
+      "WebFetch", "WebSearch",
+      "Read(/~/Documents/GitHub/**)", "Read(/~/.claude/**)", "Read(/~/AppData/**)",
+      "Bash(*monosemanticity*)", "Bash(*GitHub*)", "Bash(*.claude/projects*)"
+    ]
+  }
+}

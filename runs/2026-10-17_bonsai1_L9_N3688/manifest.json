@@ -1,0 +1,10 @@
+{
+ "neuron": "bonsai1/L9/N3688",
+ "room": "~/Documents/neuron-cleanroom",
+ "room_initial_commit": "bc16961",
+ "interp_commit": "2dae2f0 (pre-rename, package 'mono'; room assembled by hand, before build_room.py existed)",
+ "hints": "methods",
+ "gmoo_budget": 1,
+ "hours": 3,
+ "note": "First run. The room was built by hand from the interp toolchain then called 'mono', scrubbed of nerve-specific prompts and docstring examples. The room README included the methods hints (now --hints methods). See room_README.md, room_settings.json and BRIEF.md for exactly what the agent saw."
+}
