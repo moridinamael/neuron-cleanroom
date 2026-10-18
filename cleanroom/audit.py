@@ -57,7 +57,8 @@ def main():
                 if re.search(r"(?i)permission.{0,40}(denied|blocked)|access is denied|sandbox", out_txt) and it.get("exit_code"):
                     denied.add(it.get("id", ""))
             continue
-        content = (ev.get("message") or {}).get("content")
+        msg = ev.get("message")
+        content = msg.get("content") if isinstance(msg, dict) else None
         for c in content if isinstance(content, list) else []:
             if c.get("type") == "tool_use":
                 calls[c["id"]] = {"tool": c["name"], "input": json.dumps(c["input"], ensure_ascii=False),

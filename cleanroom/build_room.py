@@ -110,7 +110,11 @@ def build(a):
             f"Read({slash(interp)}/**)", f"Read({slash(home / '.claude')}/**)",
             f"Bash(*{interp.name}*)", "Bash(*.claude/projects*)", "Bash(*.claude\\projects*)"]
     if os.name == "nt":
-        deny.append(f"Read({slash(home / 'AppData')}/**)")
+        # Deny application data and other projects' Claude scratchpads, but not this room's own session
+        # scratchpad (AppData/Local/Temp/claude/<room key>/...), which the agent legitimately uses.
+        tmp = home / "AppData" / "Local" / "Temp" / "claude"
+        deny += [f"Read({slash(home / 'AppData' / 'Roaming')}/**)", f"Read({slash(home / 'AppData' / 'LocalLow')}/**)",
+                 f"Read({slash(tmp)}/*GitHub*/**)", f"Read({slash(tmp)}/*survey*/**)"]
     deny += [f"Read({slash(Path(p))}/**)" for p in a.deny_read]
     (out / ".claude").mkdir()
     (out / ".claude" / "settings.json").write_text(json.dumps(
