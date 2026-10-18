@@ -1,0 +1,9 @@
+b6eeba7 2026-10-18 10:37:39 -0600 Final report and summary for L12/N5397
+0963733 2026-10-18 10:28:37 -0600 Pre-register round 5 (- pole sub-jobs); record round 4 outcome
+7a23aec 2026-10-18 10:27:50 -0600 Blind test answer key (sha256 d237cd1e...)
+5f831a4 2026-10-18 10:27:13 -0600 Blind labeller predictions (before scoring)
+9b9c6f4 2026-10-18 10:26:27 -0600 Pre-register round 4 blind corpus labelling test
+714e27d 2026-10-18 10:15:27 -0600 Pre-register round 3 tests (refined + label, - break attempts)
+17c2fb4 2026-10-18 10:12:41 -0600 Pre-register bank, holdout and round 2 predictions
+fe255af 2026-10-18 10:07:38 -0600 Pre-register round 1 quick tests and predictions
+a1acb11 2026-10-18 09:54:05 -0600 Clean room: toolchain, brief

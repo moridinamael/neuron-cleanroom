@@ -84,6 +84,7 @@ Limits on independence:
 | Run | Neuron | Hints | Outcome |
 |---|---|---|---|
 | [2026-10-17](runs/2026-10-17_bonsai1_L9_N3688/) | bonsai1/L9/N3688 ("nerve") | methods | Audit clean (51 calls, 0 flagged). The agent found the 'nerve', 'strong' and violent-harm branches and called the + pole "several jobs". The − pole is somatosensory physiology. 6 of 8 pre-registered predictions held. The room was built by hand before `build_room.py` existed; see its `manifest.json`. |
+| [2026-10-18](runs/2026-10-18_bonsai1_L12_N5397/) | bonsai1/L12/N5397 (random draw, seed 20261018) | none | Audit clean (77 calls; 2 uses of its own scratchpad to hide a blind-test key). Found a window-start artifact in the scan behind our failed + label. The + pole peaks on row-ending line breaks in long hex/byte dumps; the − pole is four number/code sub-jobs with separate feeders. Verdict: several jobs for both poles. 7 of 8 predictions held. |
 
 ## Licence
 

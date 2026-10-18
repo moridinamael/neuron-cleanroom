@@ -40,5 +40,21 @@
   "separator",
   "after a number",
   "dense-detail"
- ]
+ ],
+ "launch": {
+  "model": "claude-opus-5-5",
+  "flags": [
+   "--model",
+   "claude-opus-5-5",
+   "--setting-sources",
+   "project",
+   "--strict-mcp-config",
+   "--allowedTools",
+   "Bash,Read,Edit,Write,Glob,Grep,Agent,NotebookEdit",
+   "--output-format",
+   "stream-json",
+   "--verbose"
+  ],
+  "exit_code": 0
+ }
 }

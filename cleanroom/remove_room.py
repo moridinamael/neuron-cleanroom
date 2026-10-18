@@ -5,6 +5,7 @@ into the real weights or Python environment, then delete the rest.
 """
 import os
 import shutil
+import stat
 import sys
 from pathlib import Path
 
@@ -18,14 +19,17 @@ def unlink(p: Path):
 
 def main():
     room = Path(sys.argv[1]).resolve()
-    if not (room / "BRIEF.md").exists() or not (room / ".claude" / "settings.json").exists():
+    if not (room / ".claude" / "settings.json").exists() or not ((room / "BRIEF.md").exists() or (room / "README.md").exists()):
         sys.exit(f"{room} does not look like a clean room; refusing")
     links = [room / ".venv", *((room / "models").iterdir() if (room / "models").exists() else [])]
     for p in links:
         if p.is_symlink() or (os.name == "nt" and p.is_dir() and os.path.realpath(p) != str(p)):
             unlink(p)
             print("unlinked", p.name)
-    shutil.rmtree(room)
+    def writable(func, path, exc):  # git object files are read-only on Windows
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    shutil.rmtree(room, onexc=writable)
     print("removed", room)
 
 
