@@ -67,9 +67,12 @@ def main():
         else:
             skipped.append(rel)
     branch = f"cleanroom/{run.name}"
+    checkout = interp  # the shared checkout: other sessions may be working in it, so never switch its branch
     if not a.no_commit:
-        git(interp, "fetch", "-q", "origin")
-        git(interp, "checkout", "-q", "-b", branch, "origin/main")
+        git(checkout, "fetch", "-q", "origin")
+        wt = checkout.parent / f".export-{run.name}"
+        git(checkout, "worktree", "add", "-q", "-b", branch, str(wt), "origin/main")
+        interp = wt  # all writes, commits and checks happen in this private worktree
     # 1) tests files + predictions
     pred_dst = interp / "runs" / "cleanroom" / run.name
     pred_dst.mkdir(parents=True, exist_ok=True)
@@ -118,7 +121,7 @@ def main():
     for f in ("REPORT.md", "summary.json", "audit.json", "scored.json"):
         if (run / f).exists():
             shutil.copy2(run / f, pred_dst / f)
-    py = interp / ".venv" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
+    py = checkout / ".venv" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
     v = subprocess.run([str(py), "-m", "bonsai_interp.graph.validate"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
     print(v.stdout[-1500:])
     if v.returncode != 0:
@@ -147,16 +150,18 @@ def main():
     if a.merge:
         url = pr.stdout.strip()
         subprocess.run(["gh", "pr", "merge", url, "--merge", "--repo", a.repo], cwd=interp, check=True)
-        git(interp, "checkout", "-q", "main")
-        git(interp, "pull", "-q", "origin", "main")
+        git(interp, "fetch", "-q", "origin")
+        git(interp, "checkout", "-q", "--detach", "origin/main")
         subprocess.run([str(py), "-m", "bonsai_interp.graph.fold"], cwd=interp, check=True)
         strict = subprocess.run([str(py), "-m", "bonsai_interp.graph.validate", "--strict"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
         if strict.returncode != 0:
             sys.exit("validate --strict failed after the fold; NOT pushing the fold commit (circuit breaker)\n" + strict.stdout[-800:])
         git(interp, "add", "graph/neurons", "graph/edges.json", "graph/index.json")
         git(interp, "commit", "-q", "-m", f"fold after {url.rsplit('/', 1)[-1] if url else run.name}")
-        git(interp, "push", "-q", "origin", "main")
+        git(interp, "push", "-q", "origin", "HEAD:main")
         print("merged, folded on main and pushed")
+    git(checkout, "worktree", "remove", "--force", str(interp))
+    print(f"removed the export worktree; the shared checkout {checkout} was not touched (pull it to see the change)")
 
 
 if __name__ == "__main__":
