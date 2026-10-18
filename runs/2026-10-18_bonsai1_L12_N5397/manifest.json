@@ -1,0 +1,44 @@
+{
+ "neuron": "bonsai1/L12/N5397",
+ "room": "~\\Documents\\rooms\\L12_N5397",
+ "room_initial_commit": "a1acb117aa70e7ba4fd4f7ecdb0dbbcc0521b786",
+ "interp_commit": "a4d218d9128b0fd0f73d7667b1504a9110f5631a",
+ "interp_ref": "main",
+ "files": {
+  "bonsai_interp/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/model.py": "3e2f84d97f5f50d4",
+  "bonsai_interp/explore.py": "0f5115ef0e7a1bdf",
+  "bonsai_interp/inverse/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/inverse/problem.py": "8aad7d59dd73d5d4",
+  "bonsai_interp/inverse/solvers.py": "fd76eff154e1d17e",
+  "bonsai_interp/inverse/neuron.py": "c925ccd567ecdbda",
+  "bonsai_interp/inverse/linear.py": "7ac0357ceb22cf48",
+  "bonsai_interp/probe/__init__.py": "e3b0c44298fc1c14",
+  "bonsai_interp/probe/workspace.py": "ab79d23f97ce3f9f",
+  "bonsai_interp/probe/forward.py": "c37b06fb3e826048",
+  "bonsai_interp/probe/textinv.py": "edbca27395aa786d",
+  "bonsai_interp/probe/run.py": "1a01d298ae7b7db9",
+  "bonsai_interp/probe/induce.py": "066f3a6c3f2fe43b",
+  "bonsai_interp/probe/neighbors.py": "7069baa29ea68190",
+  "bonsai_interp/probe/quick.py": "078c412890487288",
+  "bonsai_interp/probe/bands.py": "e6fba7ceaf8fc616"
+ },
+ "hints": "none",
+ "gmoo_budget": 1,
+ "hours": 3,
+ "deny": [
+  "WebFetch",
+  "WebSearch",
+  "Read(/~/Documents/GitHub/monosemanticity/**)",
+  "Read(/~/.claude/**)",
+  "Bash(*monosemanticity*)",
+  "Bash(*.claude/projects*)",
+  "Bash(*.claude\\projects*)",
+  "Read(/~/AppData/**)"
+ ],
+ "forbid_checked": [
+  "separator",
+  "after a number",
+  "dense-detail"
+ ]
+}

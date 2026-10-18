@@ -115,6 +115,8 @@ def build(a):
             and ".venv" not in p.parts and "models" not in p.parts
             for w in forbidden if w in p.read_text(encoding="utf-8", errors="ignore").lower()]
     if hits:
+        for lk in [out / ".venv", *(out / "models").iterdir()]:  # unlink weights/env links before deleting
+            os.rmdir(lk) if os.name == "nt" else lk.unlink()
         shutil.rmtree(out, ignore_errors=True)
         sys.exit(f"forbidden words found in the room, not sealed: {hits[:10]}")
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=out, check=True)
@@ -147,7 +149,7 @@ def main():
     ap.add_argument("--gmoo-budget", type=int, default=1)
     ap.add_argument("--hours", type=float, default=3)
     ap.add_argument("--deny-read", nargs="*", default=[], help="extra folders the agent must not read")
-    ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room (e.g. known labels)")
+    ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room, e.g. key words of the existing label (not the target id: the brief names it)")
     a = ap.parse_args()
     interp = Path(a.interp)
     a.data, a.models = a.data or interp / "data", a.models or interp / "models"
