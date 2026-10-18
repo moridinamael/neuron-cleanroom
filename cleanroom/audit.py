@@ -56,10 +56,17 @@ def main():
                 results[c["tool_use_id"]] = txt
                 if re.search(r"(?i)permission.{0,40}(denied|blocked)|denied by|not allowed", txt):
                     denied.add(c["tool_use_id"])
-    flagged = []
+    # Claude Code gives each session its own scratchpad under .../claude/<project key>/; the key is the room path with
+    # every non-alphanumeric character turned into '-'. Using it is not a leak, so it is listed separately.
+    key = re.sub(r"[^a-z0-9]", "-", room)
+    flagged, scratch = [], []
     for i, c in calls.items():
         raw = c["text"].replace("\\", "/")  # the real argument text (decoded), with Windows separators normalised
         paths = [p for p in outside.findall(raw) if room_name not in p.lower() and room not in p.lower()]
+        own = [p for p in paths if f"/claude/{key}/" in p.lower()]
+        if own:
+            scratch.append({"tool": c["tool"], "paths": own[:3], "input": c["input"][:300]})
+            paths = [p for p in paths if p not in own]
         why = ([f"path outside the room: {paths[:3]}"] if paths else []) + \
               ([f"names {named.findall(raw)[:3]}"] if named.search(raw) else []) + (["web tool"] if c["tool"] in WEB else [])
         if why:
@@ -67,11 +74,11 @@ def main():
                             "input": c["input"][:400], "result_head": results.get(i, "")[:300]})
     out = {"tool_calls": len(calls), "by_tool": dict(Counter(c["tool"] for c in calls.values())),
            "sub_agent_calls": sum(c["sub_agent"] for c in calls.values()), "denied_calls": len(denied),
-           "flagged": flagged,
+           "flagged": flagged, "own_scratchpad_uses": scratch,
            "denied": [{"tool": calls[i]["tool"], "input": calls[i]["input"][:300]} for i in denied if i in calls]}
     (run / "audit.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{out['tool_calls']} tool calls {out['by_tool']}; sub-agent calls {out['sub_agent_calls']}; "
-          f"denied {out['denied_calls']}; flagged {len(flagged)}")
+          f"denied {out['denied_calls']}; own scratchpad uses {len(scratch)}; flagged {len(flagged)}")
     for f in flagged:
         print(f"  FLAG {f['tool']} denied={f['denied']} {f['why']}: {f['input'][:160]}")
     sys.exit(1 if flagged else 0)
