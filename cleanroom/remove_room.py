@@ -21,7 +21,8 @@ def main():
     room = Path(sys.argv[1]).resolve()
     if not (room / ".claude" / "settings.json").exists() or not ((room / "BRIEF.md").exists() or (room / "README.md").exists()):
         sys.exit(f"{room} does not look like a clean room; refusing")
-    links = [room / ".venv", *((room / "models").iterdir() if (room / "models").exists() else [])]
+    links = [d / ".venv" for d in (room, room / "lab")] + [m for d in (room, room / "lab") if (d / "models").exists() for m in (d / "models").iterdir()]
+    links = [p for p in links if p.exists() or p.is_symlink()]
     for p in links:
         if p.is_symlink() or (os.name == "nt" and p.is_dir() and os.path.realpath(p) != str(p)):
             unlink(p)

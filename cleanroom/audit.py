@@ -75,6 +75,10 @@ def main():
     for i, c in calls.items():
         raw = c["text"].replace("\\", "/")  # the real argument text (decoded), with Windows separators normalised
         paths = [p for p in outside.findall(raw) if room_name not in p.lower() and room not in p.lower()]
+        # a '../x' path from a subfolder of the room is still inside it when x exists in the room (Codex
+        # sometimes works from a nested checkout); a real escape such as '../../GitHub/…' does not resolve there
+        paths = [p for p in paths if not (p.startswith("../") and not p.startswith("../../")
+                                          and p[3:].split("/")[0] and (Path(room) / p[3:].split("/")[0]).exists())]
         own = [p for p in paths if f"/claude/{key}/" in p.lower()]
         if own:
             scratch.append({"tool": c["tool"], "paths": own[:3], "input": c["input"][:300]})

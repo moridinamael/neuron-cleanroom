@@ -68,6 +68,10 @@ def build(a):
     L, n = map(int, a.neuron.split("/"))
     commit = git(interp, "rev-parse", a.ref).strip()
     out.mkdir(parents=True)
+    root = out
+    if a.layout == "nested":  # Codex makes the workspace root's git folder read-only; a repo one level down is writable
+        out = root / "lab"
+        out.mkdir()
     hashes = {}
     for f in ALLOW:
         src = git(interp, "show", f"{commit}:{f}")
@@ -126,10 +130,17 @@ def build(a):
     subprocess.run(["git", "add", "-A"], cwd=out, check=True)
     subprocess.run(["git", "commit", "-q", "-m", "Clean room: toolchain, brief"], cwd=out, check=True)
     room_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=out, capture_output=True, text=True).stdout.strip()
+    if root != out:
+        shutil.copy2(out / "BRIEF.md", root / "BRIEF.md")
+        (root / "README.md").write_text("# Workspace\n\nEverything is in `lab/`: the toolchain, the data and its own git repository. "
+                                        "`cd lab` and work from there; commit inside `lab/`. The brief is `lab/BRIEF.md` (copied here).\n",
+                                        encoding="utf-8")
+        (root / ".claude").mkdir(exist_ok=True)
+        shutil.copy2(out / ".claude" / "settings.json", root / ".claude" / "settings.json")
     run = Path(a.run).resolve()
     run.mkdir(parents=True, exist_ok=True)
     (run / "manifest.json").write_text(json.dumps({
-        "neuron": f"{a.model}/L{L}/N{n}", "room": str(out), "room_initial_commit": room_commit,
+        "neuron": f"{a.model}/L{L}/N{n}", "room": str(root), "repo": str(out), "room_initial_commit": room_commit,
         "interp_commit": commit, "interp_ref": a.ref, "files": hashes, "hints": a.hints,
         "gmoo_budget": a.gmoo_budget, "hours": a.hours, "handle": a.handle, "deny": deny, "forbid_checked": a.forbid}, indent=1), encoding="utf-8")
     shutil.copy2(out / "BRIEF.md", run / "BRIEF.md")
@@ -152,6 +163,7 @@ def main():
     ap.add_argument("--gmoo-budget", type=int, default=1)
     ap.add_argument("--hours", type=float, default=3)
     ap.add_argument("--handle", default="cleanroom-claude", help="contributor handle the agent signs its contributions with")
+    ap.add_argument("--layout", choices=["flat", "nested"], default="flat", help="nested: work happens in lab/ with its own repo (use for Codex)")
     ap.add_argument("--deny-read", nargs="*", default=[], help="extra folders the agent must not read")
     ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room, e.g. key words of the existing label (not the target id: the brief names it)")
     a = ap.parse_args()
