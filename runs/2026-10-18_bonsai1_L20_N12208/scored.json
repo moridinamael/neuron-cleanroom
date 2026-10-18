@@ -1,0 +1,15 @@
+{
+ "scored": "2026-10-18, after REPORT.md and summary.json",
+ "run": {"agent": "claude-code opus-5.5", "wall_clock_min": 160, "tool_calls": 53, "exported_contributions": 10, "new_poles": 6, "edges": 4,
+         "note": "ran alongside two other rooms for part of the time (GPU contention, driver reset at 11:22); slower than a solo run"},
+ "audit": "53 tool calls, 0 flagged, 0 denied; 2 uses of its own session scratchpad.",
+ "predictions": [
+  {"id": "P1", "p": 0.75, "outcome": false, "note": "+ verdict 'one main job with offshoots' (copy-ahead in repeated structured records), confidence 0.6"},
+  {"id": "P2", "p": 0.65, "outcome": false, "note": "- verdict 'one main job with offshoots' (segment end with little established context), confidence 0.5; not called dense"},
+  {"id": "P3", "p": 0.4, "outcome": true, "note": "the - pole is explicitly a little-context / fresh-start effect"},
+  {"id": "P4", "p": 0.7, "outcome": true, "note": "4 feeders labelled and tested (3 held), 4 edges"},
+  {"id": "P5", "p": 0.5, "outcome": true, "note": "both final labels held (5/8 and 6/8 with at most 1 near miss)"},
+  {"id": "P6", "p": 0.9, "outcome": true, "note": "clean"}
+ ],
+ "highlights": ["My glance read both poles as diffuse; the agent found structure in both: a copy-ahead (induction-like) job in repeated records for +, and a fresh-context segment-end job for -."]
+}

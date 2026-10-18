@@ -1,0 +1,18 @@
+e09c747 2026-10-18 11:55:08 -0600 REPORT.md and summary.json for L20/N12208
+6bc7578 2026-10-18 11:54:03 -0600 Solo, DE inversion and induce outputs for L20/N12208+
+b8d72f8 2026-10-18 11:42:18 -0600 Bank and pre-registered holdout for L20/N12208+ (predict: 4 record lists fire >=0.3, 4 controls quiet)
+6308e08 2026-10-18 11:41:51 -0600 Record feeder edges into L20/N12208+/- (weights = play step mean drop)
+39b431f 2026-10-18 11:41:44 -0600 Results: feeder interpret tests (L0/N11769- held, L3/N9864+ held, L2/N11953- failed, L1/N9909+ held)
+ab2093f 2026-10-18 11:41:10 -0600 Fix placeholder-like bracket in pre-registered feeder test L3_N9864_pos (not yet run)
+e804f56 2026-10-18 11:39:24 -0600 Pre-register interpret test for feeder L1_N9909_pos
+45cb946 2026-10-18 11:39:23 -0600 Pre-register interpret test for feeder L2_N11953_neg
+f5c2a8e 2026-10-18 11:39:23 -0600 Pre-register interpret test for feeder L3_N9864_pos
+1ec3d50 2026-10-18 11:39:23 -0600 Pre-register interpret test for feeder L0_N11769_neg
+7e06b3f 2026-10-18 11:35:18 -0600 Results: interpret tests for L20/N12208+ (held 5/8, 0/8) and L20/N12208- (held 6/8, 1/8)
+514fda1 2026-10-18 11:34:45 -0600 Fix placeholder-like token in pre-registered test for bonsai1/L20/N12208- (not yet run)
+3f91646 2026-10-18 11:33:53 -0600 Pre-register interpret test for bonsai1/L20/N12208-
+0898785 2026-10-18 11:33:39 -0600 Pre-register interpret test for bonsai1/L20/N12208+
+11d47a9 2026-10-18 11:33:39 -0600 v2 results; exploration e4
+a7f2795 2026-10-18 11:29:39 -0600 v1 results; pre-register v2 tests (- doc-start boundary, + prose vs records)
+ce225af 2026-10-18 11:27:10 -0600 Pre-register v1 tests for L20/N12208 (+ template continuation, - clause end)
+471d7e9 2026-10-18 10:52:28 -0600 Clean room: toolchain, brief
