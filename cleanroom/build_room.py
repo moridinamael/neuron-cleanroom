@@ -31,7 +31,7 @@ ALLOW = [
     "bonsai_interp/probe/neighbors.py", "bonsai_interp/probe/quick.py", "bonsai_interp/probe/bands.py",
     # contributor commands, so the room's tests come out in the graph's contribution format
     "bonsai_interp/graph/__init__.py", "bonsai_interp/graph/contrib.py", "bonsai_interp/graph/protocols.py",
-    "bonsai_interp/graph/play.py",
+    "bonsai_interp/graph/play.py", "bonsai_interp/graph/methods.py",
 ]
 DATA = ["corpus.npz", "scan_bonsai1.npz"]
 NEURON_REF = re.compile(r"\b(\d{1,2})/(\d{2,5})\b")  # neuron examples like 9/3688 in docstrings
@@ -102,7 +102,7 @@ def build(a):
         readme = readme.replace("<!-- HINTS:methods -->\n", "").replace("<!-- /HINTS -->\n", "")
     (out / "README.md").write_text(readme, encoding="utf-8")
     brief = (HERE / "templates" / "BRIEF.md").read_text(encoding="utf-8").format(
-        model_name=MODEL_NAMES[a.model][0], L=L, n=n, gmoo_budget=a.gmoo_budget, hours=a.hours, handle=a.handle)
+        model_name=MODEL_NAMES[a.model][0], L=L, n=n, gmoo_budget=a.gmoo_budget, hours=a.hours, handle=a.handle, agent=a.agent_label or a.handle)
     (out / "BRIEF.md").write_text(brief, encoding="utf-8")
     # the seal
     home = Path.home()
@@ -163,6 +163,7 @@ def main():
     ap.add_argument("--gmoo-budget", type=int, default=1)
     ap.add_argument("--hours", type=float, default=3)
     ap.add_argument("--handle", default="cleanroom-claude", help="contributor handle the agent signs its contributions with")
+    ap.add_argument("--agent-label", default=None, help="what the agent writes in methods.agent, e.g. 'claude-code opus-5.5 (blind room)'")
     ap.add_argument("--layout", choices=["flat", "nested"], default="flat", help="nested: work happens in lab/ with its own repo (use for Codex)")
     ap.add_argument("--deny-read", nargs="*", default=[], help="extra folders the agent must not read")
     ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room, e.g. key words of the existing label (not the target id: the brief names it)")

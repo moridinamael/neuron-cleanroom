@@ -76,6 +76,12 @@ def main():
     # 2) results, edges, replicate summaries
     for p, rel, c, prov in take:
         c["provenance"] = {**prov, "bundle": f"neuron-cleanroom/{run.relative_to(run.parents[1]).as_posix()}/room.bundle"}
+        if not c.get("methods"):  # rooms built before the methods block: fill it from the room and the launch record
+            launch = man.get("launch", {})
+            files = {q.name for q in (room / "probes").rglob("*") if q.is_file()} if (room / "probes").exists() else set()
+            seen = {"look"} | {"quick-test"} | ({"bands"} if list((room / "data").glob("bands_*.npz")) else set())                 | ({"bank-solo"} if "solo.json" in files else set()) | ({"held-out"} if "holdout.json" in files else set())                 | ({"inverse-de"} if "invert_de.json" in files else set()) | ({"inverse-gmoo"} if "invert_gmoo.json" in files else set())                 | ({"induce"} if "induce.json" in files else set()) | ({"neighbors"} if "neighbors.json" in files else set())                 | ({"step-out"} if c.get("kind") == "map" or "feeds" in " ".join(c.get("roles", [])) else set())
+            c["methods"] = {"agent": f"{launch.get('agent', 'claude')} {launch.get('model', '')}".strip() + " (blind room)",
+                            "screens": sorted(seen | {"blind-room"}), "harness": "neuron-cleanroom", "inferred_at_export": True}
         dst = interp / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(json.dumps(c, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
@@ -88,7 +94,10 @@ def main():
         nid = f"bonsai1/{L}/{n}{pole}"
         folder = f"{L}_{n}_{'pos' if pole == '+' else 'neg'}"
         cid = f"core-{run.name.lower().replace('_', '-')}-{'pos' if pole == '+' else 'neg'}-blind"
+        launch = man.get("launch", {})
         rc = {"id": cid, "kind": "replicate", "neuron": nid, "contributor": handle, "created": git(room, "log", "-1", "--format=%cI").strip(),
+              "methods": {"agent": f"{launch.get('agent', 'claude')} {launch.get('model', '')}".strip() + " (blind room)",
+                          "screens": ["blind-room"], "harness": "neuron-cleanroom"},
               "label": b["label"], "verdict": b["verdict"], "confidence": b["confidence"],
               "evidence": [f"runs/cleanroom/{run.name}/REPORT.md"],
               "tests": [{"protocol": "cleanroom@1", "tests_file": f"runs/cleanroom/{run.name}/predictions.json",
