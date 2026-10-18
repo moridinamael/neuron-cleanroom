@@ -2,8 +2,8 @@
  "neuron": "bonsai1/L17/N9491",
  "room": "~\\Documents\\rooms\\L17_N9491",
  "repo": "~\\Documents\\rooms\\L17_N9491",
- "room_initial_commit": "3389901793a4564081c8c7040cdafbeff99ad378",
- "interp_commit": "bf66e84ea2731a674d354145f1ad4f73d4924ac4",
+ "room_initial_commit": "53193f04d3cdbd85ff3293a2344fec6ad686685d",
+ "interp_commit": "daff44a9559876991206f977bbe0cc2213b47628",
  "interp_ref": "main",
  "files": {
   "bonsai_interp/__init__.py": "0f9cd0a013ef0bdd",
@@ -24,9 +24,10 @@
   "bonsai_interp/probe/quick.py": "078c412890487288",
   "bonsai_interp/probe/bands.py": "8a53ca0d1c33cbb4",
   "bonsai_interp/graph/__init__.py": "b8e5aab5e92d9461",
-  "bonsai_interp/graph/contrib.py": "65a0124fde3d0485",
-  "bonsai_interp/graph/protocols.py": "ad1da0d1077b9364",
-  "bonsai_interp/graph/play.py": "1034fc2ed81d687e"
+  "bonsai_interp/graph/contrib.py": "6a18320f3d4af3a9",
+  "bonsai_interp/graph/protocols.py": "458518947534a5a1",
+  "bonsai_interp/graph/play.py": "17e8493bd5b4cdfd",
+  "bonsai_interp/graph/methods.py": "a1b0f03b8506c804"
  },
  "hints": "none",
  "gmoo_budget": 1,
@@ -40,7 +41,29 @@
   "Bash(*monosemanticity*)",
   "Bash(*.claude/projects*)",
   "Bash(*.claude\\projects*)",
-  "Read(/~/AppData/**)"
+  "Read(/~/AppData/Roaming/**)",
+  "Read(/~/AppData/LocalLow/**)",
+  "Read(/~/AppData/Local/Temp/claude/*GitHub*/**)",
+  "Read(/~/AppData/Local/Temp/claude/*survey*/**)"
  ],
- "forbid_checked": []
+ "forbid_checked": [],
+ "launch": {
+  "agent": "claude",
+  "model": "claude-opus-5-5",
+  "flags": [
+   "-p",
+   "--model",
+   "claude-opus-5-5",
+   "--setting-sources",
+   "project",
+   "--strict-mcp-config",
+   "--allowedTools",
+   "Bash,Read,Edit,Write,Glob,Grep,Agent,NotebookEdit",
+   "--output-format",
+   "stream-json",
+   "--verbose"
+  ],
+  "exit_code": 0
+ },
+ "predictions_commit": "a3f6d5a"
 }

@@ -33,7 +33,9 @@ analysis can use whatever tools you like.
   ```
 
   Fill in the file it writes: the label, 8 sentences that should fire, 8 near misses, and
-  optionally `short`, `unit_kind` and `confidence`. Commit that file **on its own**. Then run
+  optionally `short`, `unit_kind` and `confidence`. Set `methods.agent` to "claude-code opus-5.5 (blind room)" and list in
+  `methods.screens` the analyses you used for this label (vocabulary in
+  `bonsai_interp/graph/methods.py`). Commit that file **on its own**. Then run
   `python -m bonsai_interp.graph.play run <that file>` and commit the results in a **separate,
   later** commit. A failed label is worth recording too.
 - **Map the immediate neighbourhood.** For each pole, list its strongest feeders:

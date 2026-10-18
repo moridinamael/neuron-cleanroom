@@ -81,6 +81,11 @@ def main():
         paths = [p for p in paths if not (p.startswith("../") and not p.startswith("../../")
                                           and p[3:].split("/")[0] and (Path(room) / p[3:].split("/")[0]).exists())]
         own = [p for p in paths if f"/claude/{key}/" in p.lower()]
+        # '../x' after `cd <a subfolder of its own scratchpad>` stays in the scratchpad (one level up, not two)
+        cd = re.match(r'\s*cd\s+"?([^"&;]+)"?', raw)
+        if cd and f"/claude/{key}/" in cd.group(1).lower():
+            depth = len(cd.group(1).lower().split(f"/claude/{key}/", 1)[1].strip("/").split("/"))
+            own += [p for p in paths if p.startswith("../") and p.count("../") < depth and p not in own]
         if own:
             scratch.append({"tool": c["tool"], "paths": own[:3], "input": c["input"][:300]})
             paths = [p for p in paths if p not in own]
