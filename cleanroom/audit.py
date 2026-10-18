@@ -38,7 +38,8 @@ def main():
     room_name = Path(room).name
     # a drive path needs a real first segment (C:/Users), so code like "if a:\n" in a test sentence is not a path
     outside = re.compile(r"(?i)(?<![\w.])(?:[a-z]:/[\w.-]{2,}|/c/|/home/|/users/|~/|\.\./)[^\s\"'`]*")
-    named = re.compile(r"(?i)bonsai-interp|monosemanticity|\.claude[/\\]projects|FINDINGS\.md|graph[/\\]neurons")
+    # repo and folder names only count as part of a path, so the word "monosemanticity" in a report is not a hit
+    named = re.compile(r"(?i)[/\\](?:bonsai-interp|monosemanticity)\b|\b(?:bonsai-interp|monosemanticity)[/\\]|\.claude[/\\]projects|FINDINGS\.md|graph[/\\]neurons")
     calls, results, denied = {}, {}, set()
     for line in (run / "transcript.jsonl").read_text(encoding="utf-8").splitlines():
         try:
