@@ -14,6 +14,14 @@ graph live in [bonsai-interp](https://github.com/moridinamael/bonsai-interp). Th
 the toolchain from a **pinned commit** of that repo and never copies the graph, probes or
 findings into a room.
 
+## When to use a blind room
+
+Blind rooms are the most expensive check in the survey: one to two GPU-hours per neuron. They are
+**sampled QC**, not the default way to label. Quick missions colour in the map; a random sample of
+held labels (about one in ten) gets a blind room, drawn with `cleanroom.draw --qc --seed <n>` so the
+choice is reproducible and can't be cherry-picked. Use a blind room on purpose for a contested label,
+a label about to be cited, or a circuit trace. Run one room at a time on a GPU that also drives a display.
+
 ## How a run works
 
 1. **Build the room** with `cleanroom.build_room`. This creates a new folder with its own git

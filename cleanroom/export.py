@@ -5,11 +5,13 @@
 1. Reads the room (before it is removed) and its git history.
 2. Keeps a contribution only if its pre-registration (.tests.json) was committed in the room
    strictly BEFORE its results; anything else is reported and skipped.
-3. Commits into bonsai-interp in two steps, so the interp history keeps the same order:
+3. On a new branch cleanroom/<run> from origin/main, commits in two steps, so the order is kept:
    first the tests files plus our predictions for the run, then the results, the edges, and one
    'replicate' contribution per pole that carries the agent's final label and verdict.
    Results gain a "provenance" field pointing at the room commits in this repository's bundle.
-4. Runs fold and validate in bonsai-interp.
+4. Validates the contributions, checks the commit order, pushes the branch and opens a PR with
+   contribution files and run evidence only (no derived graph files). With --merge it also merges
+   the PR with a merge commit and pushes a fold commit on main (validate --strict as a circuit breaker).
 """
 import argparse
 import json
@@ -33,6 +35,8 @@ def main():
     ap.add_argument("--run", required=True)
     ap.add_argument("--interp", required=True)
     ap.add_argument("--no-commit", action="store_true")
+    ap.add_argument("--repo", default="moridinamael/bonsai-interp")
+    ap.add_argument("--merge", action="store_true", help="also merge the PR (merge commit) and push a fold commit on main")
     a = ap.parse_args()
     run, interp = Path(a.run).resolve(), Path(a.interp).resolve()
     man = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
@@ -62,6 +66,10 @@ def main():
             tests_files.update(t["tests_file"] for t in c.get("tests", []))
         else:
             skipped.append(rel)
+    branch = f"cleanroom/{run.name}"
+    if not a.no_commit:
+        git(interp, "fetch", "-q", "origin")
+        git(interp, "checkout", "-q", "-b", branch, "origin/main")
     # 1) tests files + predictions
     pred_dst = interp / "runs" / "cleanroom" / run.name
     pred_dst.mkdir(parents=True, exist_ok=True)
@@ -111,15 +119,44 @@ def main():
         if (run / f).exists():
             shutil.copy2(run / f, pred_dst / f)
     py = interp / ".venv" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
-    subprocess.run([str(py), "-m", "bonsai_interp.graph.fold"], cwd=interp, check=True)
     v = subprocess.run([str(py), "-m", "bonsai_interp.graph.validate"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
     print(v.stdout[-1500:])
     if v.returncode != 0:
         sys.exit("validate failed: fix before committing the results")
-    if not a.no_commit:
-        git(interp, "add", "graph", str(pred_dst.relative_to(interp)))
-        git(interp, "commit", "-q", "-m", f"Clean-room run {run.name}: results, edges and blind verdicts ({len(take)} contributions)")
     print(f"exported {len(take)} contributions; skipped {len(skipped)} whose order could not be verified: {skipped}")
+    if a.no_commit:
+        return
+    git(interp, "add", "graph/contributions", str(pred_dst.relative_to(interp)))
+    git(interp, "commit", "-q", "-m", f"Clean-room run {run.name}: results, edges and blind verdicts ({len(take)} contributions)")
+    c = subprocess.run([str(py), "-m", "bonsai_interp.graph.check_prereg", "--base", "origin/main"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
+    print(c.stdout[-800:])
+    if c.returncode != 0:
+        sys.exit(f"check_prereg failed on branch {branch}; nothing pushed")
+    git(interp, "push", "-q", "-u", "origin", branch)
+    summ_line = " · ".join(f"{k}: {v.get('verdict')}" for k, v in summ.items() if isinstance(v, dict) and "verdict" in v)
+    body = "\n".join([
+        f"Blind clean-room run `{run.name}` ({man.get('launch', {}).get('agent', 'claude')}), exported by `cleanroom.export`.", "",
+        f"- Contributions: {len(take)} (pre-registration order verified in the room's git history; provenance in each results file)",
+        f"- Blind verdicts: {summ_line}",
+        f"- Audit: see runs/cleanroom/{run.name}/audit.json",
+        "- Methods: blind-room (+ screens listed per contribution)", "",
+        "Contribution files and run evidence only; no derived graph files."])
+    pr = subprocess.run(["gh", "pr", "create", "--repo", a.repo, "--head", branch, "--base", "main",
+                         "--title", f"replicate: blind run {run.name}", "--body", body], cwd=interp, capture_output=True, text=True, encoding="utf-8")
+    print(pr.stdout.strip() or pr.stderr.strip())
+    if a.merge:
+        url = pr.stdout.strip()
+        subprocess.run(["gh", "pr", "merge", url, "--merge", "--repo", a.repo], cwd=interp, check=True)
+        git(interp, "checkout", "-q", "main")
+        git(interp, "pull", "-q", "origin", "main")
+        subprocess.run([str(py), "-m", "bonsai_interp.graph.fold"], cwd=interp, check=True)
+        strict = subprocess.run([str(py), "-m", "bonsai_interp.graph.validate", "--strict"], cwd=interp, capture_output=True, text=True, encoding="utf-8")
+        if strict.returncode != 0:
+            sys.exit("validate --strict failed after the fold; NOT pushing the fold commit (circuit breaker)\n" + strict.stdout[-800:])
+        git(interp, "add", "graph/neurons", "graph/edges.json", "graph/index.json")
+        git(interp, "commit", "-q", "-m", f"fold after {url.rsplit('/', 1)[-1] if url else run.name}")
+        git(interp, "push", "-q", "origin", "main")
+        print("merged, folded on main and pushed")
 
 
 if __name__ == "__main__":
