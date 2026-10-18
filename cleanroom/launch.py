@@ -61,7 +61,10 @@ def main():
         env["CODEX_HOME"] = str(home)
         cmd = ["codex", "exec", "--json", "--skip-git-repo-check", "-s", "workspace-write", "-C", str(room)] + (["-m", a.model] if a.model else []) + [PROMPT]
     with open(run / "transcript.jsonl", "w", encoding="utf-8") as out, open(run / "stderr.txt", "w", encoding="utf-8") as err:
-        rc = subprocess.run(cmd, cwd=room, stdout=out, stderr=err, env=env, stdin=subprocess.DEVNULL).returncode
+        # below-normal priority keeps the desktop responsive; run ONE room at a time on a GPU that also drives a display
+        # (three concurrent rooms on a 16 GB card triggered a driver reset on 2026-10-18)
+        flags = getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
+        rc = subprocess.run(cmd, cwd=room, stdout=out, stderr=err, env=env, stdin=subprocess.DEVNULL, creationflags=flags).returncode
     if a.agent == "codex":
         shutil.rmtree(env["CODEX_HOME"], ignore_errors=True)
     meta = json.loads((run / "manifest.json").read_text(encoding="utf-8")) if (run / "manifest.json").exists() else {}

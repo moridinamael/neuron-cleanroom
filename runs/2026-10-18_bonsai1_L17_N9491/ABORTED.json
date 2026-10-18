@@ -1,0 +1,1 @@
+{"note": "First attempt stopped at 11:35 after about 20 minutes, with no commits: three concurrent rooms overloaded the GPU (NVIDIA driver resets, event 153 at 11:22). The room is rebuilt from scratch for the re-run so the new agent does not see the stopped one's files. Predictions (committed earlier) stand."}
