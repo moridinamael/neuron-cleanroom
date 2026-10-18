@@ -1,0 +1,6 @@
+{
+ "drawn": "2026-10-18, before anyone looked at the neuron",
+ "rule": "python random.Random(20261018): layer uniform in 6..24, index uniform in 0..12287; redraw if already in the bonsai-interp graph. First draw is used whatever it looks like (no cherry-picking for interpretability).",
+ "seed": 20261018,
+ "neuron": "bonsai1/L12/N5397"
+}
