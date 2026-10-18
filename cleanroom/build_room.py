@@ -23,7 +23,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ALLOW = [
-    "bonsai_interp/__init__.py", "bonsai_interp/model.py", "bonsai_interp/explore.py",
+    "bonsai_interp/__init__.py", "bonsai_interp/env.py", "bonsai_interp/model.py", "bonsai_interp/explore.py",
     "bonsai_interp/inverse/__init__.py", "bonsai_interp/inverse/problem.py", "bonsai_interp/inverse/solvers.py",
     "bonsai_interp/inverse/neuron.py", "bonsai_interp/inverse/linear.py",
     "bonsai_interp/probe/__init__.py", "bonsai_interp/probe/workspace.py", "bonsai_interp/probe/forward.py",
@@ -33,6 +33,7 @@ ALLOW = [
     "bonsai_interp/graph/__init__.py", "bonsai_interp/graph/contrib.py", "bonsai_interp/graph/protocols.py",
     "bonsai_interp/graph/play.py", "bonsai_interp/graph/methods.py",
 ]
+OPTIONAL = {"bonsai_interp/env.py"}  # absent before interp 1c67e0f (device detection); rooms at older refs skip it
 DATA = ["corpus.npz", "scan_bonsai1.npz"]
 NEURON_REF = re.compile(r"\b(\d{1,2})/(\d{2,5})\b")  # neuron examples like 9/3688 in docstrings
 MODEL_NAMES = {"bonsai1": ("Bonsai-8B (1-bit)", "Bonsai-8B-unpacked")}
@@ -49,10 +50,17 @@ def slash(p: Path):
 
 
 def link(src: Path, dst: Path):
-    if os.name == "nt":
+    if os.name == "nt":  # a junction needs no admin rights or developer mode
         subprocess.run(["cmd", "/c", "mklink", "/J", str(dst), str(src)], check=True, capture_output=True)
     else:
         dst.symlink_to(src, target_is_directory=src.is_dir())
+
+
+def unlink(p: Path):
+    if os.name == "nt":
+        os.rmdir(p)  # removes a junction without touching its target
+    else:
+        p.unlink()
 
 
 def scrub(text, L, n):
@@ -74,7 +82,12 @@ def build(a):
         out.mkdir()
     hashes = {}
     for f in ALLOW:
-        src = git(interp, "show", f"{commit}:{f}")
+        try:
+            src = git(interp, "show", f"{commit}:{f}")
+        except subprocess.CalledProcessError:
+            if f in OPTIONAL:
+                continue
+            raise
         dst = out / f
         dst.parent.mkdir(parents=True, exist_ok=True)
         body = scrub(src, L, n)
@@ -127,7 +140,7 @@ def build(a):
             for w in forbidden if w in p.read_text(encoding="utf-8", errors="ignore").lower()]
     if hits:
         for lk in [out / ".venv", *(out / "models").iterdir()]:  # unlink weights/env links before deleting
-            os.rmdir(lk) if os.name == "nt" else lk.unlink()
+            unlink(lk)
         shutil.rmtree(out, ignore_errors=True)
         sys.exit(f"forbidden words found in the room, not sealed: {hits[:10]}")
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=out, check=True)

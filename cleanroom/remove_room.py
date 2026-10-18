@@ -30,7 +30,8 @@ def main():
     def writable(func, path, exc):  # git object files are read-only on Windows
         os.chmod(path, stat.S_IWRITE)
         func(path)
-    shutil.rmtree(room, onexc=writable)
+    # on macOS and Linux deleting a read-only file needs only a writable folder, so no handler there
+    shutil.rmtree(room, onexc=writable if os.name == "nt" else None)
     print("removed", room)
 
 

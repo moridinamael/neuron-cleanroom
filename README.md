@@ -64,6 +64,20 @@ The harness needs Python 3.11+ (standard library only), git, and the
 [Claude Code CLI](https://docs.claude.com/en/docs/claude-code). It also needs a bonsai-interp
 checkout with its data (`scripts/fetch_data.sh`), models and environment.
 
+**Platforms.** Windows is the reference platform, and macOS and Linux work too. The
+platform-specific parts sit behind `os.name` checks, so each platform keeps its own behaviour:
+
+| | Windows | macOS and Linux |
+|---|---|---|
+| Weight and environment links (build, remove) | junctions | symlinks |
+| Read-only git object files on remove | cleared before deleting | no handler needed |
+| Codex config | `[windows] sandbox = "unelevated"` | none; Codex's own sandbox (Seatbelt on macOS) |
+| Agent process priority | below normal | `nice 10` |
+
+On a Mac the room runs the toolchain on Apple's MPS backend. Export `BONSAI_DEVICE=mps` before
+`cleanroom.launch`, so that a room which cannot reach the GPU stops at once instead of running on
+the CPU. bonsai-interp's README, under "Running on a Mac", has the requirements.
+
 ## What "blind" does and does not mean here
 
 What the room contains and what the agent is told:
