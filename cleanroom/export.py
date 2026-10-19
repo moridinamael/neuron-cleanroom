@@ -103,7 +103,10 @@ def main():
         git(interp, "commit", "-q", "-m", f"Clean-room run {run.name}: pre-registered tests (verified first in the room) and our predictions")
     # 2) results, edges, replicate summaries
     for p, rel, c, prov in take:
-        c["provenance"] = {**prov, "bundle": f"neuron-cleanroom/{run.relative_to(run.parents[1]).as_posix()}/room.bundle"}
+        # the bundle that holds the commits cited above: room.bundle, or <nested>.bundle when the agent committed in a nested
+        # repository (Codex's study_checkout); run 4's records name room.bundle although its commits are in study_checkout.bundle
+        bname = "room.bundle" if room == Path(man["room"]).expanduser() else f"{room.name}.bundle"
+        c["provenance"] = {**prov, "bundle": f"neuron-cleanroom/{run.relative_to(run.parents[1]).as_posix()}/{bname}"}
         if not c.get("methods"):  # rooms built before the methods block: fill it from the room and the launch record
             launch = man.get("launch", {})
             files = {q.name for q in (room / "probes").rglob("*") if q.is_file()} if (room / "probes").exists() else set()

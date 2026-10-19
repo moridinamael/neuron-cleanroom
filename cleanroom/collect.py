@@ -22,6 +22,11 @@ def main():
         else:
             print(f"missing {f} in the room")
     subprocess.run(["git", "bundle", "create", str(run / "room.bundle"), "--all"], cwd=room, check=True, capture_output=True)
+    # an agent that committed in a nested repository (Codex makes one when the room's root .git is read-only to it):
+    # bundle it too, as <name>.bundle, which is what export cites as provenance
+    for d in room.iterdir():
+        if d.is_dir() and (d / ".git").exists():
+            subprocess.run(["git", "bundle", "create", str(run / f"{d.name}.bundle"), "--all"], cwd=d, check=True, capture_output=True)
     log = subprocess.run(["git", "log", "--format=%h %ad %s", "--date=iso"], cwd=room, capture_output=True, text=True).stdout
     (run / "room_git_log.txt").write_text(log, encoding="utf-8")
     from cleanroom.export import redact
