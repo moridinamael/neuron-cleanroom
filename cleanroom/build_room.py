@@ -116,6 +116,14 @@ def build(a):
     (out / "README.md").write_text(readme, encoding="utf-8")
     brief = (HERE / "templates" / "BRIEF.md").read_text(encoding="utf-8").format(
         model_name=MODEL_NAMES[a.model][0], L=L, n=n, gmoo_budget=a.gmoo_budget, hours=a.hours, handle=a.handle, agent=a.agent_label or a.handle)
+    if a.context:  # a guided run: the agent is handed the map and our expectations on purpose
+        (out / "context").mkdir()
+        for c in a.context:
+            shutil.copy2(c, out / "context" / Path(c).name)
+        brief += ("\n## Context you are given (this is a guided run, not a blind one)\n\n"
+                  "Read `context/CONTEXT.md` first. It holds what is already known about this neuron and its neighbourhood, "
+                  "and what we expect you to find. Treat our expectations as hypotheses to test, not facts: confirming or "
+                  "refuting them with pre-registered tests is the job.\n")
     (out / "BRIEF.md").write_text(brief, encoding="utf-8")
     # the seal
     home = Path.home()
@@ -158,7 +166,7 @@ def build(a):
     run.mkdir(parents=True, exist_ok=True)
     (run / "manifest.json").write_text(json.dumps({
         "neuron": f"{a.model}/L{L}/N{n}", "room": str(root), "repo": str(out), "room_initial_commit": room_commit,
-        "interp_commit": commit, "interp_ref": a.ref, "files": hashes, "hints": a.hints,
+        "interp_commit": commit, "interp_ref": a.ref, "files": hashes, "hints": a.hints, "guided": bool(a.context), "context": [Path(c).name for c in a.context],
         "gmoo_budget": a.gmoo_budget, "hours": a.hours, "handle": a.handle, "deny": deny, "forbid_checked": a.forbid}, indent=1), encoding="utf-8")
     shutil.copy2(out / "BRIEF.md", run / "BRIEF.md")
     print(f"room sealed at {out} (commit {room_commit[:7]}), interp {commit[:7]}, hints={a.hints}; manifest in {run}")
@@ -183,6 +191,8 @@ def main():
     ap.add_argument("--agent-label", default=None, help="what the agent writes in methods.agent, e.g. 'claude-code opus-5.5 (blind room)'")
     ap.add_argument("--layout", choices=["flat", "nested"], default="flat", help="nested: work happens in lab/ with its own repo (use for Codex)")
     ap.add_argument("--deny-read", nargs="*", default=[], help="extra folders the agent must not read")
+    ap.add_argument("--context", nargs="*", default=[], help="guided run: files given to the agent (copied into context/; "
+                    "a CONTEXT.md among them is linked from the brief). Leaves the room un-blind on purpose")
     ap.add_argument("--forbid", nargs="*", default=[], help="words that must not appear anywhere in the room, e.g. key words of the existing label (not the target id: the brief names it)")
     a = ap.parse_args()
     interp = Path(a.interp)

@@ -1,0 +1,13 @@
+{
+ "written": "2026-10-19, before the room was built; we wrote the agent's context (context/CONTEXT.md) and commit these predictions before launch",
+ "run": "guided circuit trace of bonsai1/L9/N3688+ (not blind: the agent is given the map and our expectations)",
+ "predictions": [
+  {"id": "P1", "claim": "The 'strong' branch has at least one feeder with a drop >= 0.3 on 'strong' contexts that is not among the known 'nerve' feeders (L3/N6493+, L8/N7756+, L5/N5628-, L7/N1548-).", "p": 0.6},
+  {"id": "P2", "claim": "Zeroing L3/N6493+ (spelling nerv) removes >= 50% of the activation on 'nerve' sentences but < 20% on 'strong' sentences.", "p": 0.7},
+  {"id": "P3", "claim": "The final verdict is packing (two features sharing the neuron) rather than shared downstream use.", "p": 0.55},
+  {"id": "P4", "claim": "The agent finds a tested, context-level explanation for 'ulnar nerve' firing while 'held his nerve' does not (a held pre-registered test that separates them).", "p": 0.4},
+  {"id": "P5", "claim": "At least 4 new edges with measured weights are recorded (feeders of the 'strong' branch or readers of the pole).", "p": 0.75},
+  {"id": "P6", "claim": "The final label is word-level ('nerve' and 'strong' tokens with context), not a meaning-level label.", "p": 0.65},
+  {"id": "P7", "claim": "Audit clean (no access outside the room beyond the given context).", "p": 0.9}
+ ]
+}
